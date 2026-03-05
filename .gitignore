@@ -1,0 +1,8 @@
+.DS_Store
+**/.DS_Store
+*.pyc
+__pycache__/
+.env
+*.log
+node_modules/
+アフィリエイト管理システム/.claude/skills/nanobanana-pro/data/browser_profile/
