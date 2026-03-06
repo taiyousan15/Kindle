@@ -1,0 +1,191 @@
+{
+  "version": "2.0.0",
+  "meta": {
+    "workflowId": "user_request",
+    "strict": true,
+    "currentPhase": 1,
+    "startedAt": "2026-03-05T16:24:43.643Z",
+    "lastUpdated": "2026-03-06T00:59:42.941Z",
+    "autoMappedSkills": [
+      {
+        "name": "太陽スタイルLP",
+        "required_skills": [
+          "taiyo-style-lp"
+        ],
+        "strict": false
+      }
+    ]
+  },
+  "intentContractRef": null,
+  "activeSkillId": null,
+  "activeSkillStepId": null,
+  "baseline": {
+    "files": {}
+  },
+  "registeredInputs": {
+    "referenceAssets": []
+  },
+  "locks": {
+    "referenceAssets": []
+  },
+  "evidence": {
+    "skills_used": {},
+    "read_log": [],
+    "approved_deviations": [],
+    "skillEvidence": [],
+    "skillEvidenceIndexByStepId": {},
+    "required_skills": {
+      "github": {
+        "requestedAt": "2026-03-05T16:24:43.643Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "taiyousan15": {
+        "requestedAt": "2026-03-05T16:24:43.643Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "taisun_agent": {
+        "requestedAt": "2026-03-05T16:24:43.643Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "install": {
+        "requestedAt": "2026-03-05T16:24:43.643Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "world-research": {
+        "requestedAt": "2026-03-05T16:26:47.627Z",
+        "used": false,
+        "autoMapped": true
+      },
+      "mega-research-plus": {
+        "requestedAt": "2026-03-05T16:26:47.627Z",
+        "used": false,
+        "autoMapped": true
+      },
+      "unified-research": {
+        "requestedAt": "2026-03-05T16:26:47.627Z",
+        "used": false,
+        "autoMapped": true
+      },
+      "research-free": {
+        "requestedAt": "2026-03-05T16:26:47.627Z",
+        "used": false,
+        "autoMapped": true
+      },
+      "research": {
+        "requestedAt": "2026-03-05T16:26:47.627Z",
+        "used": false,
+        "autoMapped": true
+      },
+      "tavily": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "serpapi": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "brave": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "search": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "api": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "newsapi": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "www": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "settings": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "openrouter": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "console": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "exa": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "fred": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "docs": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "X": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "apify": {
+        "requestedAt": "2026-03-05T17:49:17.792Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "taiyo-style-lp": {
+        "requestedAt": "2026-03-06T00:59:42.941Z",
+        "used": false,
+        "autoMapped": true
+      },
+      "Users": {
+        "requestedAt": "2026-03-05T17:54:03.003Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "matsumototoshihiko": {
+        "requestedAt": "2026-03-05T17:54:03.003Z",
+        "used": false,
+        "autoMapped": false
+      },
+      "Desktop": {
+        "requestedAt": "2026-03-05T17:54:03.003Z",
+        "used": false,
+        "autoMapped": false
+      }
+    }
+  },
+  "decisions": {
+    "assetReuse": []
+  },
+  "approvals": {
+    "deviations": []
+  },
+  "validations": {
+    "lastResults": []
+  },
+  "completed_phases": [],
+  "blockers": []
+}

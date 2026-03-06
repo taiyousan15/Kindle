@@ -1,0 +1,253 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PartnerStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum AffiliateStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+}
+
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  CANCELLED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum ConversionType {
+  LINE_OPTIN
+  EMAIL_OPTIN
+  FRONTEND_PURCHASE
+  BACKEND_PURCHASE
+}
+
+enum PartnerRank {
+  STANDARD
+  SILVER
+  GOLD
+  PLATINUM
+  VIP
+}
+
+model Partner {
+  id                  String        @id @default(cuid())
+  tenantId            String        @default("default")
+  email               String
+  name                String
+  code                String        @unique
+  commissionRate      Int           @default(10)
+  rank                PartnerRank   @default(STANDARD)
+  totalConversions    Int           @default(0)
+  status              PartnerStatus @default(PENDING)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  minimumPayoutAmount Int           @default(5000)
+  coolingPeriodDays   Int           @default(30)
+  partnerAccessToken  String?       @unique
+  tokenExpiresAt      DateTime?
+  lineUserId          String?
+  notifyConversion    Boolean       @default(true)
+  notifyPayout        Boolean       @default(true)
+  bio                 String?
+  websiteUrl          String?
+  channels            String[]      @default([])
+  bankAccountInfo     Json?
+  referredById        String?
+
+  referredBy  Partner?              @relation("PartnerReferral", fields: [referredById], references: [id])
+  referrals   Partner[]             @relation("PartnerReferral")
+  commissions AffiliateCommission[]
+  conversions AffiliateConversion[]
+  links       AffiliateLink[]
+  payouts     AffiliatePayout[]
+  onboarding  AffiliateOnboarding?
+
+  @@index([tenantId])
+  @@index([code])
+  @@index([tenantId, email])
+}
+
+model AffiliateOnboarding {
+  id              String   @id @default(cuid())
+  partnerId       String   @unique
+  profileComplete Boolean  @default(false)
+  channelSelected Boolean  @default(false)
+  firstLinkCopied Boolean  @default(false)
+  firstConversion Boolean  @default(false)
+  completionScore Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  partner Partner @relation(fields: [partnerId], references: [id])
+}
+
+model LandingPage {
+  id          String   @id @default(cuid())
+  tenantId    String   @default("default")
+  name        String
+  url         String
+  lpCode      String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  templates AffiliateTemplate[]
+  links     AffiliateLink[]
+
+  @@index([tenantId])
+  @@index([lpCode])
+}
+
+model AffiliateTemplate {
+  id        String      @id @default(cuid())
+  tenantId  String      @default("default")
+  lpId      String
+  title     String
+  body      String      @db.Text
+  medium    String?
+  sortOrder Int         @default(0)
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  lp LandingPage @relation(fields: [lpId], references: [id], onDelete: Cascade)
+
+  @@index([lpId])
+  @@index([tenantId])
+}
+
+model AffiliateLink {
+  id          String   @id @default(cuid())
+  tenantId    String   @default("default")
+  partnerId   String
+  lpId        String?
+  url         String
+  linkCode    String   @unique
+  clicks      Int      @default(0)
+  conversions Int      @default(0)
+  lineOptins  Int      @default(0)
+  emailOptins Int      @default(0)
+  revenue     Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  partner   Partner              @relation(fields: [partnerId], references: [id])
+  lp        LandingPage?         @relation(fields: [lpId], references: [id])
+  clickRels AffiliateClick[]
+  convRels  AffiliateConversion[]
+
+  @@index([partnerId])
+  @@index([linkCode])
+  @@index([tenantId])
+  @@index([lpId])
+}
+
+model AffiliateClick {
+  id        String   @id @default(cuid())
+  tenantId  String   @default("default")
+  linkId    String
+  partnerId String?
+  lpId      String?
+  ipAddress String?
+  userAgent String?
+  referrer  String?
+  createdAt DateTime @default(now())
+
+  link AffiliateLink @relation(fields: [linkId], references: [id])
+
+  @@index([linkId])
+  @@index([tenantId])
+  @@index([createdAt])
+  @@index([lpId])
+}
+
+model AffiliateConversion {
+  id         String          @id @default(cuid())
+  tenantId   String          @default("default")
+  partnerId  String
+  linkId     String?
+  lpId       String?
+  orderId    String?
+  lineUserId String?
+  type       ConversionType  @default(LINE_OPTIN)
+  amount     Int             @default(0)
+  status     AffiliateStatus @default(PENDING)
+  approvedAt DateTime?
+  payableAt  DateTime?
+  createdAt  DateTime        @default(now())
+
+  link           AffiliateLink?        @relation(fields: [linkId], references: [id])
+  partner        Partner               @relation(fields: [partnerId], references: [id])
+  commissionRels AffiliateCommission[]
+
+  @@index([tenantId])
+  @@index([partnerId])
+  @@index([status])
+  @@index([lpId])
+  @@index([lineUserId])
+  @@index([type])
+}
+
+model AffiliateCommission {
+  id            String           @id @default(cuid())
+  tenantId      String           @default("default")
+  partnerId     String
+  conversionId  String?
+  amount        Int
+  percentage    Int
+  type          String?
+  tier          String?
+  status        CommissionStatus @default(PENDING)
+  paidAt        DateTime?
+  paymentMethod String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  partner    Partner              @relation(fields: [partnerId], references: [id])
+  conversion AffiliateConversion? @relation(fields: [conversionId], references: [id])
+
+  @@index([tenantId])
+  @@index([partnerId])
+  @@index([status])
+}
+
+model AffiliatePayout {
+  id             String       @id @default(cuid())
+  tenantId       String       @default("default")
+  partnerId      String
+  amount         Int
+  currency       String       @default("JPY")
+  status         PayoutStatus @default(PENDING)
+  paymentMethod  String?
+  paymentDetails Json?
+  paidAt         DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  partner Partner @relation(fields: [partnerId], references: [id])
+
+  @@index([tenantId])
+  @@index([partnerId])
+  @@index([status])
+}
