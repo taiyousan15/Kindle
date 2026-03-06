@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.routing import Route
 
 from src.api.routes import covers, genres, keywords, prediction, title
+from src.api.routes import research
 from src.core.config import get_settings
 from src.core.metrics import metrics_endpoint
 from src.core.middleware import PrometheusMiddleware
@@ -52,6 +53,7 @@ app.include_router(genres.router, prefix="/api/v1")
 app.include_router(prediction.router, prefix="/api/v1")
 app.include_router(title.router, prefix="/api/v1")
 app.include_router(covers.router, prefix="/api/v1")
+app.include_router(research.router)
 
 
 @app.get("/health")

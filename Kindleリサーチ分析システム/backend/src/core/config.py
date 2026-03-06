@@ -52,6 +52,14 @@ class Settings(BaseSettings):
     # Helium10 (Phase2)
     helium10_api_key: str = ""
 
+    # YouTube Data API v3（無料枠: 10,000 units/日）
+    youtube_api_key: str = ""
+
+    # Twitter/X Cookie認証
+    twitter_auth_token: str = ""
+    twitter_ct0: str = ""
+    twitter_twid: str = ""
+
     # App settings
     app_name: str = "Kindleリサーチ分析システム"
     app_version: str = "1.0.0"
