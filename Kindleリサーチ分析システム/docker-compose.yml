@@ -1,0 +1,86 @@
+services:
+  db:
+    image: timescale/timescaledb-ha:pg16-latest
+    environment:
+      POSTGRES_DB: kindle_research
+      POSTGRES_USER: ${DB_USER:-kindle_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-kindle_pass}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-kindle_user} -d kindle_research"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file: .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${DB_USER:-kindle_user}:${DB_PASSWORD:-kindle_pass}@db:5432/kindle_research
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A src.tasks.celery_app worker --loglevel=info -Q default,bsr,keywords,covers
+    env_file: .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${DB_USER:-kindle_user}:${DB_PASSWORD:-kindle_pass}@db:5432/kindle_research
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+
+  beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A src.tasks.celery_app beat --loglevel=info --scheduler celery.beat:PersistentScheduler
+    env_file: .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${DB_USER:-kindle_user}:${DB_PASSWORD:-kindle_pass}@db:5432/kindle_research
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+
+volumes:
+  pgdata:

@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #030712;
+  --foreground: #f9fafb;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.score-bar {
+  @apply h-2 rounded-full bg-gray-700;
+}
+
+.score-fill {
+  @apply h-2 rounded-full transition-all duration-500;
+}

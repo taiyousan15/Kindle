@@ -1,0 +1,37 @@
+# 環境変数・シークレット（絶対にコミット禁止）
+.env
+.env.local
+.env.*.local
+.env.production
+
+# 依存関係
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+
+# ビルド成果物
+dist/
+build/
+*.egg-info/
+.next/
+out/
+*.tsbuildinfo
+
+# ログ・一時ファイル
+*.log
+logs/
+tmp/
+.cache/
+
+# OS生成ファイル
+.DS_Store
+Thumbs.db
+
+# エディタ
+.vscode/
+.idea/
+*.swp
+
+# リサーチ出力（大容量になる可能性）
+research/runs/
