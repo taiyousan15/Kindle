@@ -2,6 +2,15 @@
 
 import { useState } from "react";
 import { BarChart3, AlertTriangle } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 
 interface SalesEstimate {
   bsr: number;
@@ -111,24 +120,8 @@ export default function PredictionPage() {
               </div>
             </div>
 
-            {/* BSRクイックリファレンス */}
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-gray-400 mb-3">BSR参考値（{result.genre}ジャンル）</p>
-              {[
-                { bsr: 100, label: "超ベストセラー" },
-                { bsr: 1000, label: "ベストセラー" },
-                { bsr: 5000, label: "安定売上" },
-                { bsr: 20000, label: "ニッチで稼働中" },
-              ].map((ref) => {
-                const est = clientSideEstimate(ref.bsr, genre);
-                return (
-                  <div key={ref.bsr} className="flex items-center justify-between text-sm">
-                    <span className="text-gray-400">BSR {ref.bsr.toLocaleString()} ({ref.label})</span>
-                    <span className="text-white font-medium">月{est.monthly_estimated}冊</span>
-                  </div>
-                );
-              })}
-            </div>
+            {/* BSRクイックリファレンス グラフ */}
+            <BsrReferenceChart genre={genre} highlightBsr={result.bsr} />
 
             <div className="mt-5 flex items-start gap-2 bg-yellow-900/20 border border-yellow-700/30 rounded-lg px-4 py-3">
               <AlertTriangle className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
@@ -137,6 +130,63 @@ export default function PredictionPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+const BSR_REFS = [
+  { bsr: 100, label: "超ベストセラー" },
+  { bsr: 1000, label: "ベストセラー" },
+  { bsr: 5000, label: "安定売上" },
+  { bsr: 20000, label: "ニッチ稼働" },
+  { bsr: 50000, label: "低稼働" },
+];
+
+const CHART_COLORS = ["#22c55e", "#3b82f6", "#a78bfa", "#f59e0b", "#6b7280"];
+
+function BsrReferenceChart({ genre, highlightBsr }: { genre: string; highlightBsr: number }) {
+  const data = BSR_REFS.map((ref, i) => ({
+    ...ref,
+    monthly: clientSideEstimate(ref.bsr, genre).monthly_estimated,
+    color: CHART_COLORS[i],
+  }));
+
+  const highlighted = [...data].sort((a, b) =>
+    Math.abs(a.bsr - highlightBsr) - Math.abs(b.bsr - highlightBsr)
+  )[0];
+
+  return (
+    <div className="mt-5">
+      <p className="text-xs font-semibold text-gray-400 mb-3">
+        BSR参考値グラフ（{genre}ジャンル）
+      </p>
+      <ResponsiveContainer width="100%" height={180}>
+        <BarChart data={data} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
+          <XAxis dataKey="label" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} unit="冊" />
+          <Tooltip
+            contentStyle={{ background: "#1f2937", border: "1px solid #374151", borderRadius: 8 }}
+            labelStyle={{ color: "#e5e7eb", fontSize: 12 }}
+            formatter={(value: number) => [`${value}冊/月`, "推定販売数"]}
+          />
+          <Bar dataKey="monthly" radius={[4, 4, 0, 0]}>
+            {data.map((entry) => (
+              <Cell
+                key={entry.bsr}
+                fill={entry.bsr === highlighted.bsr ? "#3b82f6" : "#374151"}
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+      <div className="mt-3 grid grid-cols-5 gap-1">
+        {data.map((ref) => (
+          <div key={ref.bsr} className="text-center">
+            <p className="text-xs text-gray-500">BSR {ref.bsr.toLocaleString()}</p>
+            <p className="text-xs font-medium text-white">月{ref.monthly}冊</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

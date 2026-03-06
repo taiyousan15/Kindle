@@ -3,9 +3,12 @@ from contextlib import asynccontextmanager
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.routing import Route
 
 from src.api.routes import covers, genres, keywords, prediction, title
 from src.core.config import get_settings
+from src.core.metrics import metrics_endpoint
+from src.core.middleware import PrometheusMiddleware
 from src.db.database import engine
 from src.db.models import (  # noqa: F401
     BookCover, BookReview, BSRHistory, CollectionJob,
@@ -31,6 +34,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.add_middleware(PrometheusMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -38,6 +42,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Prometheus scrape エンドポイント
+app.add_route("/metrics", metrics_endpoint, include_in_schema=False)
 
 # ルーター登録
 app.include_router(keywords.router, prefix="/api/v1")

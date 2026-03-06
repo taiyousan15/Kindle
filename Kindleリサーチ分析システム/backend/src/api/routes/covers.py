@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.analyzers.cover_analyzer import CoverAnalyzer
 from src.core.config import get_settings
+from src.core.llm_client import LLMClient
 from src.db.database import get_db
 from src.db.models import BookCover
 
@@ -67,7 +68,7 @@ async def get_cover_trends(
 async def analyze_cover(req: CoverAnalyzeRequest):
     """表紙画像URLをClaude Visionで分析する。"""
     settings = get_settings()
-    analyzer = CoverAnalyzer(settings.anthropic_api_key)
+    analyzer = CoverAnalyzer(LLMClient(settings))
     result = await analyzer.analyze(req.image_url, req.asin)
 
     return CoverAnalyzeResponse(

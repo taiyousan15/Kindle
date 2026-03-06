@@ -87,10 +87,22 @@ class BSRPredictor:
     """
     LightGBMによるBSR時系列予測。
     モデル未学習時はトレンドベースの簡易予測を使用。
+    起動時に models/bsr_lgbm.pkl が存在すれば自動ロードする。
     """
 
     def __init__(self) -> None:
-        self._model = None
+        self._model = self._try_load_model()
+
+    @staticmethod
+    def _try_load_model():
+        try:
+            from src.ml.train_bsr_model import load_model
+            model = load_model()
+            if model is not None:
+                log.info("bsr_lgbm_model_loaded")
+            return model
+        except Exception:
+            return None
 
     def predict(
         self,

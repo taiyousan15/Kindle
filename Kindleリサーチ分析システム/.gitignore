@@ -3,6 +3,7 @@
 .env.local
 .env.*.local
 .env.production
+.env.prod
 
 # 依存関係
 node_modules/

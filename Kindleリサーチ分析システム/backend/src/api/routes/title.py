@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 from src.analyzers.title_analyzer import TitleAnalyzer
 from src.core.config import get_settings
+from src.core.llm_client import LLMClient
 
 router = APIRouter(prefix="/title", tags=["title"])
 
@@ -30,7 +31,7 @@ class TitleAnalyzeResponse(BaseModel):
 async def analyze_title(req: TitleAnalyzeRequest):
     """タイトルを分析してスコアと改善案を返す。"""
     settings = get_settings()
-    analyzer = TitleAnalyzer(settings.anthropic_api_key)
+    analyzer = TitleAnalyzer(LLMClient(settings))
     result = await analyzer.analyze(
         title=req.title,
         genre=req.genre,
